@@ -3,6 +3,6 @@
 #include <stdlib.h>
 
 int main(void) {
-	puts("Vamos con toda! Animales de la programacion");
+	puts("Que materia de meirda, y todavia no epezamos el tp");
 	return EXIT_SUCCESS;
 }
