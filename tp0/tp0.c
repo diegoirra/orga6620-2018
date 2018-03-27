@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     if (salidaConsola != 1){
         rewind(outf);
         fclose(outf);
-        printf("Archivo guardado en %s/%s\n\n", pathToExe, output_filename);
+        printf("Archivo guardado en %s/%s\n", pathToExe, output_filename);
     }
     
     
