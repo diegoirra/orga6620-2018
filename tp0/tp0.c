@@ -98,6 +98,7 @@ int main(int argc, char** argv) {
     
     double real,imag;
     
+    if (salidaConsola == 1) fprintf(stdout, "P2 \n%d %d \n255 \n", res_horizontal, res_vertical); else fprintf(outf, "P2 \n%d %d \n255 \n", res_horizontal, res_vertical);
    
     for (int y = 1; y <= res_vertical; y++){
         for (int x = 1; x <= res_horizontal; x++){
