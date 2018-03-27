@@ -17,9 +17,9 @@
 #define OUT_FILE "-" //lo manda por consola
 
 double complex string_to_complex(char* z){
-	float real, imag;
+	double real, imag;
 	char i;
-	int scanresult = sscanf(z, "%f%f%c", &real, &imag, &i);
+	int scanresult = sscanf(z, "%lf%lf%c", &real, &imag, &i);
 	if (scanresult < 3){
 		puts("Error en argumeto complejo. Usando 0.1");
 		return 0.1;
@@ -30,9 +30,9 @@ double complex string_to_complex(char* z){
 void handle(int res_horizontal,int res_vertical, double complex center,
 		double width, double height, double complex seed, FILE* outf){
 	printf("Resolution: %dx%d\n", res_horizontal, res_vertical);
-	printf("Centro de coordenadas del plano compejo: %f%+fi\n", creal(center), cimag(center));
+	printf("Centro de coordenadas del plano compejo: %Lf%+Lfi\n", creall(center), cimagl(center));
 	printf("Ancho: %f. Altura: %f.\n", width, height);
-    printf("Seed: %f%+fi\n", creal(seed), cimag(seed));
+    printf("Seed: %Lf%+Lfi\n", creall(seed), cimagl(seed));
 }
 
 
@@ -57,10 +57,10 @@ int main(int argc, char** argv) {
 			center = string_to_complex(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "--width") == 0){
-			width = atoi(argv[i+1]);
+			width = atof(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-H") == 0 || strcmp(argv[i], "--height") == 0){
-			height = atoi(argv[i+1]);
+			height = atof(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "--seed") == 0){
 			seed = string_to_complex(argv[i+1]);
@@ -78,10 +78,10 @@ int main(int argc, char** argv) {
     }
     
     
-    float pasoH = ((width) / (float)(res_horizontal))/2;
-    float pasoV = ((height) / (float)(res_vertical))/2;
+    double pasoH = ((width) / (double)(res_horizontal))/2;
+    double pasoV = ((height) / (double)(res_vertical))/2;
     int contadorBrillo;
-    float temp, valorAbsoluto;
+    double temp, valorAbsoluto;
     double complex pixel;
 
     FILE* outf;
@@ -106,7 +106,7 @@ int main(int argc, char** argv) {
             imag = -pasoV * (2 * y -1) + height / 2 + cimagl(center);
             pixel = real + imag*I;
             for (contadorBrillo = 0; contadorBrillo <= N; contadorBrillo++){
-                valorAbsoluto = sqrtf((creall(pixel) * creall(pixel)) + (cimagl(pixel) * cimagl(pixel)));
+                valorAbsoluto = sqrtf( (creall(pixel) * creall(pixel)) + (cimagl(pixel) * cimagl(pixel)) );
                 if (valorAbsoluto > 2) break;
                 temp = ((creall(pixel))*(creall(pixel)))-((cimagl(pixel))*(cimagl(pixel))) + creall(seed);
                 imag = ((cimagl(pixel))*(creall(pixel)))+((creall(pixel))*(cimagl(pixel))) + cimagl(seed);
