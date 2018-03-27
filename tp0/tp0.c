@@ -57,7 +57,6 @@ int main(int argc, char** argv) {
 			center = string_to_complex(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "--width") == 0){
-			width = atof(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-H") == 0 || strcmp(argv[i], "--height") == 0){
 			height = atof(argv[i+1]);
