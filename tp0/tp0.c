@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <complex.h>
 #include <errno.h>
 #include <math.h>
 
@@ -10,39 +9,45 @@
 #define ERROR_OUTPUT -1
 #define N 255
 #define RESOLUTION_DEFAULT "640x480"
-#define CENTER_DEFAUlT 0+0*I
+#define CENTER_DEFAUlT {0,0}
 #define WIDTH_DEFAULT 2
 #define HEIGHT_DEFAULT 2
-#define SEED_DEFAULT -0.726895347709114071439 + 0.188887129043845954792*I
+#define SEED_DEFAULT {-0.726895347709114071439, 0.188887129043845954792}
 #define OUT_FILE "-" //lo manda por consola
 
-double complex string_to_complex(char* z){
-	double real, imag;
+typedef struct complex{
+	long double real;
+	long double imag;
+}complex;
+
+complex string_to_complex(char* zstring){
+	complex z;
 	char i;
-	int scanresult = sscanf(z, "%lf%lf%c", &real, &imag, &i);
+	int scanresult = sscanf(zstring, "%Lf%Lf%c", &z.real, &z.imag, &i);
 	if (scanresult < 3){
 		puts("Error en argumeto complejo. Usando 0.1");
-		return 0.1;
+		complex x = {0.1, 0} ;
+		return x;
 	}
-	return real+imag*I;
+	return z;
 }
 
-void handle(int res_horizontal,int res_vertical, double complex center,
-		double width, double height, double complex seed, FILE* outf){
+void handle(int res_horizontal,int res_vertical, complex center,
+		double width, double height, complex seed, FILE* outf){
 	printf("Resolution: %dx%d\n", res_horizontal, res_vertical);
-	printf("Centro de coordenadas del plano compejo: %Lf%+Lfi\n", creall(center), cimagl(center));
+	printf("Centro de coordenadas del plano compejo: %Lf%+Lfi\n", center.real, center.imag);
 	printf("Ancho: %f. Altura: %f.\n", width, height);
-    printf("Seed: %Lf%+Lfi\n", creall(seed), cimagl(seed));
+    printf("Seed: %Lf%+Lfi\n", seed.real, seed.imag);
 }
 
 
 int main(int argc, char** argv) {
 
 	char* resolution = RESOLUTION_DEFAULT;
-	double complex center = CENTER_DEFAUlT;
+	complex center = CENTER_DEFAUlT;
 	double width = WIDTH_DEFAULT;
 	double height = HEIGHT_DEFAULT;
-	double complex seed = SEED_DEFAULT;
+	complex seed = SEED_DEFAULT;
 	char* output_filename = OUT_FILE;
     int salidaConsola = -1;
     char* pathToExe = argv[0];
@@ -57,6 +62,7 @@ int main(int argc, char** argv) {
 			center = string_to_complex(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-w") == 0 || strcmp(argv[i], "--width") == 0){
+			width = atof(argv[i+1]);
 		}
 		if(strcmp(argv[i], "-H") == 0 || strcmp(argv[i], "--height") == 0){
 			height = atof(argv[i+1]);
@@ -77,11 +83,11 @@ int main(int argc, char** argv) {
     }
     
     
-    double pasoH = ((width) / (double)(res_horizontal))/2;
-    double pasoV = ((height) / (double)(res_vertical))/2;
+    long double pasoH = ((width) / (double)(res_horizontal))/2;
+    long double pasoV = ((height) / (double)(res_vertical))/2;
     int contadorBrillo;
-    double temp, valorAbsoluto;
-    double complex pixel;
+    long double temp, valorAbsoluto;
+    complex pixel;
 
     FILE* outf;
     if (strcmp(output_filename, "-") != 0){
@@ -95,21 +101,23 @@ int main(int argc, char** argv) {
 
     handle(res_horizontal, res_vertical, center, width, height, seed, outf);
     
-    double real,imag;
+    long double real,imag;
     
     if (salidaConsola == 1) fprintf(stdout, "P2 \n%d %d \n255 \n", res_horizontal, res_vertical); else fprintf(outf, "P2 \n%d %d \n255 \n", res_horizontal, res_vertical);
    
     for (int y = 0; y <= res_vertical; y++){
         for (int x = 1; x <= res_horizontal; x++){
-            real = pasoH * (2 * x -1) - width / 2 + creall(center);
-            imag = -pasoV * (2 * y -1) + height / 2 + cimagl(center);
-            pixel = real + imag*I;
+            real = pasoH * (2 * x -1) - width / 2 + center.real;
+            imag = -pasoV * (2 * y -1) + height / 2 + center.imag;
+            pixel.real = real;
+			pixel.imag = imag;
             for (contadorBrillo = 0; contadorBrillo <= N; contadorBrillo++){
-                valorAbsoluto = sqrtf( (creall(pixel) * creall(pixel)) + (cimagl(pixel) * cimagl(pixel)) );
+                valorAbsoluto = sqrtf( pixel.real * pixel.real + (pixel.imag * pixel.imag));
                 if (valorAbsoluto > 2) break;
-                temp = ((creall(pixel))*(creall(pixel)))-((cimagl(pixel))*(cimagl(pixel))) + creall(seed);
-                imag = ((cimagl(pixel))*(creall(pixel)))+((creall(pixel))*(cimagl(pixel))) + cimagl(seed);
-                pixel = temp + imag*I;
+                temp = (pixel.real*pixel.real) -(pixel.imag*pixel.imag) + seed.real;
+                imag = (pixel.imag*pixel.imag) +(pixel.real*pixel.imag) + seed.imag;
+                pixel.real = temp;
+				pixel.imag = imag;
             }
             if (salidaConsola == 1) fprintf(stdout, "%d ", contadorBrillo); else fprintf(outf, "%d ", contadorBrillo );
         }
