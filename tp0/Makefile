@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS := -g -Wall
+CFLAGS := -g -Wall -std=c99
 INPUT=tp0.c
 OUTPUT=tp0
 TESTS_DIR=tests
@@ -8,7 +8,7 @@ compile:
 	$(CC) $(CFLAGS) -o $(OUTPUT) $(INPUT) -lm	
 
 asm:
-	$(CC) $(CFLAGS) -O0 -S $(INPUT)
+	$(CC) $(CFLAGS) -O0 -S -mrnames $(INPUT)
 
 test: compile
 	#TEST imagen por defecto. Se crea archivo en /tests/

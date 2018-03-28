@@ -112,10 +112,10 @@ int main(int argc, char** argv) {
             pixel.real = real;
 			pixel.imag = imag;
             for (contadorBrillo = 0; contadorBrillo <= N; contadorBrillo++){
-                valorAbsoluto = sqrtf( pixel.real * pixel.real + (pixel.imag * pixel.imag));
+                valorAbsoluto = sqrtf( (pixel.real * pixel.real) + (pixel.imag * pixel.imag));
                 if (valorAbsoluto > 2) break;
                 temp = (pixel.real*pixel.real) -(pixel.imag*pixel.imag) + seed.real;
-                imag = (pixel.imag*pixel.imag) +(pixel.real*pixel.imag) + seed.imag;
+                imag = (pixel.imag*pixel.real) +(pixel.real*pixel.imag) + seed.imag;
                 pixel.real = temp;
 				pixel.imag = imag;
             }
