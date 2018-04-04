@@ -32,15 +32,6 @@ complex string_to_complex(char* zstring){
 	return z;
 }
 
-void handle(int res_horizontal,int res_vertical, complex center,
-		double width, double height, complex seed, FILE* outf){
-	printf("Resolution: %dx%d\n", res_horizontal, res_vertical);
-	printf("Centro de coordenadas del plano compejo: %Lf%+Lfi\n", center.real, center.imag);
-	printf("Ancho: %f. Altura: %f.\n", width, height);
-    printf("Seed: %Lf%+Lfi\n", seed.real, seed.imag);
-}
-
-
 int main(int argc, char** argv) {
 
 	char* resolution = RESOLUTION_DEFAULT;
@@ -99,8 +90,6 @@ int main(int argc, char** argv) {
     	}
     } else outf = stdout;
 
-    handle(res_horizontal, res_vertical, center, width, height, seed, outf);
-    
     long double real,imag;
     
     if (salidaConsola == 1) fprintf(stdout, "P2 \n%d %d \n255 \n", res_horizontal, res_vertical); else fprintf(outf, "P2 \n%d %d \n255 \n", res_horizontal, res_vertical);
