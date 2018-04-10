@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
         }
         valido = fprintf(outf, "\n");
         if (valido < 0) {fprintf(stderr, "Error en el output, no se pudo imprimir el salto de linea.");}
-    
+    }
     if (salidaConsola != 1){
         rewind(outf);
         fclose(outf);
