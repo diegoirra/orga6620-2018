@@ -35,31 +35,39 @@ print_header:
 
 	lw		a0, 32($fp)				# Cargo en a0 el fd
 	jal		print_p2				# Llamo a print p2
+	bltz	v0, return
 
 	lw		a0, 32($fp)
 	jal 	print_barra_n
+	bltz	v0, return
 
 	lw		a0, 32($fp)				# Llamo a print number para x_res
 	lw		a1, 36($fp)
 	jal		print_number
+	bltz	v0, return
 
 	lw		a0, 32($fp)
 	jal		print_barra_n
+	bltz	v0, return
 
 	lw		a0, 32($fp)
 	lw		a1, 40($fp)
 	jal		print_number			# Llamo a print number para y_res
+	bltz	v0, return
 
 	lw		a0, 32($fp)
 	jal		print_barra_n
+	bltz	v0, return
 
 	lw		a0, 32($fp)
 	lw		a1, 44($fp)
 	jal		print_number			# Llamo a print number para shades
+	bltz	v0, return
 
 	lw		a0, 32($fp)
 	jal		print_barra_n
 
+return:
 	move	sp, $fp 			
 
 	lw 		gp, 20(sp)			
@@ -93,6 +101,10 @@ print_p2:
 	li 		v0, SYS_write
 	syscall
 
+	bne		a3, zero, write_errorp2
+	bne		v0, 2, write_error_tamp2
+
+returnp2:
 	# Restauro registros del sra
 	move	sp, $fp 			
 
@@ -104,6 +116,13 @@ print_p2:
 
 	jr 		ra 						#vuelvo a la direccion de retorno
 
+write_errorp2:
+	li	v0, -1
+	j returnp2
+
+write_error_tamp2:
+	li	v0, -2
+	j returnp2
 
 print_barra_n:
 	.frame	$fp,  16, ra
@@ -127,7 +146,11 @@ print_barra_n:
 	li 		v0, SYS_write
 	syscall
 
+	bne		a3, zero, write_errorn
+	bne		v0, 1, write_error_tamn
+
 	# Restauro registros del sra
+returnn:
 	move	sp, $fp 			
 
 	lw 		gp, 4(sp)			
@@ -138,6 +161,13 @@ print_barra_n:
 
 	jr 		ra 						#vuelvo a la direccion de retorno
 
+write_errorn:
+	li	v0, -1
+	j returnn
+
+write_error_tamn:
+	li	v0, -3
+	j returnn
 
 print_number:
 	.frame	$fp,  32, ra 			# 16 SRA + 16 ABA
@@ -165,7 +195,12 @@ print_number:
 	li 		v0, SYS_write
 	syscall
 
+	bne		a3, zero, write_errornum
+	bne		v0, a2, write_error_tamnum
+
+
 	# Restauro registros del sra
+returnnum:
 	move	sp, $fp 			
 
 	lw 		gp, 20(sp)
@@ -175,6 +210,15 @@ print_number:
 	addu 	sp, sp, 32			#restauro stack pointer
 
 	jr 		ra 					#vuelvo a la direccion de retorno
+
+write_errornum:
+	li	v0, -1
+	j returnnum
+
+write_error_tamnum:
+	li	v0, -4
+	j returnnum
+
 
 
 #Int to String: el int va en a0, cantidad de chars guardados en v0
@@ -220,7 +264,7 @@ loop2:
     addi	t1, t1, -4
     add 	t5, t2, t1			#t5 = buffer(t2)+offset(t1)
     addi	t4, t4, 48
-    sb 		t4, (t5)
+    sb 		t4, 0(t5)
     bgez	t1, loop2
 
 exitloop2:
@@ -238,6 +282,7 @@ exitloop2:
 
 
 	.end print_header
+
 
 	.data
 	.align 2
