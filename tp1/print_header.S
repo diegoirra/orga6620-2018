@@ -256,7 +256,6 @@ loop1:
 exitloop1:
 	add 	t3, a0, zero		#t3=a0 (int a imprimir)
     move	v0, t1				#cant de chars guardados
-    #sll 	t1, t1, 2			#t5= cant_digits * 4bytes
 
 loop2:
     div 	t3, t0
