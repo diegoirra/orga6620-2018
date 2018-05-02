@@ -23,7 +23,7 @@ print_header:
 
 	# Salvo los registros del sra
 	subu 	sp, sp, 32 				# 16(SRA) + 16 (ABA)
-	sw		gp, 20(sp)				# guardo gp
+	.cprestore 20					# guardo gp
 	sw		$fp, 24(sp)				# guardo fp
 	sw 		ra, 28(sp)  			# guardo ra
 	move	$fp, sp					
@@ -39,23 +39,23 @@ print_header:
 	lw		a0, 32($fp)
 	jal 	print_barra_n
 
-	lw		a0, 32($fp)				# Llamo a print x_res
+	lw		a0, 32($fp)				# Llamo a print number para x_res
 	lw		a1, 36($fp)
-	jal		print_x_res
+	jal		print_number
 
 	lw		a0, 32($fp)
 	jal		print_barra_n
 
 	lw		a0, 32($fp)
 	lw		a1, 40($fp)
-	jal		print_y_res				# Llamo a print y_res
+	jal		print_number			# Llamo a print number para y_res
 
 	lw		a0, 32($fp)
 	jal		print_barra_n
 
 	lw		a0, 32($fp)
 	lw		a1, 44($fp)
-	jal		print_shades			# Llamo a print shades
+	jal		print_number			# Llamo a print number para shades
 
 	lw		a0, 32($fp)
 	jal		print_barra_n
@@ -80,7 +80,7 @@ print_p2:
 
 	# Salvo los registros del sra
 	subu 	sp, sp, 16 				# 16(SRA)
-	sw		gp, 4(sp)				# guardo gp
+	.cprestore 4					# guardo gp
 	sw		$fp, 8(sp)				# guardo fp
 	sw 		ra, 12(sp)  			# guardo ra
 	move	$fp, sp
@@ -89,7 +89,7 @@ print_p2:
 
 	lw		a0, 16($fp)
 	la		a1, p2
-	li		a2, 3
+	li		a2, 2
 	li 		v0, SYS_write
 	syscall
 
@@ -106,13 +106,136 @@ print_p2:
 
 
 print_barra_n:
+	.frame	$fp,  16, ra
+	
+	.set 	noreorder
+	.cpload t9
+	.set reorder
 
-print_x_res:
+	# Salvo los registros del sra
+	subu 	sp, sp, 16 				# 16(SRA)
+	.cprestore 4					# guardo gp
+	sw		$fp, 8(sp)				# guardo fp
+	sw 		ra, 12(sp)  			# guardo ra
+	move	$fp, sp
+	
+	sw		a0, 16($fp)
 
-print_y_res:
+	lw		a0, 16($fp)
+	la		a1, barran
+	li		a2, 1
+	li 		v0, SYS_write
+	syscall
 
-print_shades:
+	# Restauro registros del sra
+	move	sp, $fp 			
+
+	lw 		gp, 4(sp)			
+	lw 		ra, 12(sp)			
+	lw 		$fp, 8(sp)			
+
+	addu 	sp, sp, 16				#restauro stack pointer
+
+	jr 		ra 						#vuelvo a la direccion de retorno
+		
+
+print_number:
+	.frame	$fp,  40, ra 			# 16 SRA + 8 LTA + 16 ABA
+	
+	.set 	noreorder
+	.cpload t9
+	.set reorder
+
+	# Salvo los registros del sra
+	subu 	sp, sp, 40 				# 16(SRA)
+	.cprestore 28					# guardo gp
+	sw		$fp, 32(sp)				# guardo fp
+	sw 		ra, 36(sp)  			# guardo ra
+	move	$fp, sp
+	
+	sw		a0, 40($fp)
+	sw		a1, 44($fp)
+
+	lw		a0, 44($fp)
+	jal		inttostr
+	move	t0, v0
+
+	lw		a0, 40($fp)
+	la		a1, stringbuffer
+	lw		a2, t0   			#VER SI HAY QUE SUMARLE UNO POR EL BARRA 0
+	li 		v0, 1
+	syscall
+
+	# Restauro registros del sra
+	move	sp, $fp 			
+
+	lw 		gp, 28(sp)			
+	lw 		ra, 36(sp)			
+	lw 		$fp, 32(sp)			
+
+	addu 	sp, sp, 40				#restauro stack pointer
+
+	jr 		ra 						#vuelvo a la direccion de retorno
+
+
+#Int to String: el int va en a0, cantidad de chars guardados en v0
+
+inttostr:
+
+	.frame 	$fp, 16, ra
+	
+	.set 	noreorder
+	.cpload t9
+	.set 	reorder
+
+	subu sp, sp, 16 				# 16(SRA)
+	
+	.cprestore 4					#guardo gp en 4 + sp
+	sw $fp, 8(sp)					#guardo $fp en 8 + sp
+	sw ra, 12(sp)					#guardo ra en 12 + sp
+
+	move $fp, sp 					#$fp = sp (desde aca se usa $fp)
+
+	sw a0, 16($fp)					#int = 16 + $fp
+
+	addi t0, zero, 10		#establezco divisor base 10
+	move t1, zero			#t1=0
+	la t2, stringbuffer		#t2=stringbufferadress
+	add t3, a0, zero		#t3=a0 (int a imprimir)
+
+loop1:	div t3, t0			#t3/10 division:t4 resto:t5
+	mflo t4
+	mfhi t5
+	addi t1, t1, 1			#aumento contador de caracteres
+	bne  t3, 0, loop1		#cuando la division sea 0 ya termino el loop
+	add t3, a0, zero		#t3=a0 (int a imprimir)
+	move v0, t1				#v0=cant chars guardados
+
+loop2:	div t3, t0			#vuelvo a divir esta vez guardando en el inicio de stringbuffer de atras para adelante
+	mflo t4
+	mfhi t5
+	addi t1, t1, -1			#decremento el contador de chars
+	add t6, t2, t1			#t6=offset en string buffer = stringbuffer + t1
+	addi t5, t5, 48			#le sumo 48 al valor del resto para que quede en la escala de los decimales ascii
+	sb t5, 0(t6)			#lo guardo en t6
+	bne t3, 0, loop2		#cuando la division sea 0 ya temrino el loop
+
+#Restauro saved registers
+	
+	move sp, $fp 			#restauro valor de sp
+
+	lw gp, 4(sp)			#restauro valor de gp
+	lw ra, 12(sp)			#restauro valor de ra
+	lw $fp, 8(sp)			#restauro valor de $fp
+
+	addu sp, sp, 16			#subo stack pointer
+
+	jr ra 					#vuelvo a la funcion caller
+
+
+	.end print_header
 
 p2: .asciiz "P2"
 
 barran: .asciiz "\n"
+stringbuffer:   .space 32
