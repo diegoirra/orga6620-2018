@@ -23,7 +23,7 @@ putch:
 	sw a1, 20($fp)			#buffer
 	sw a2, 24($fp)			#bytes
 
-	li	v0, 1 				#print int
+	li	v0, SYS_write
 	syscall
 
 	# Revisamos el retorno de SYS_write: si $a3 es no-nulo, quiere

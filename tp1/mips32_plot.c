@@ -3,6 +3,8 @@
 #include <defs.h>
 #include <param.h>
 
+int print_header(int fd, int x, int y, int shades);
+
 void
 mips32_plot(param_t *parms)
 {
@@ -14,15 +16,12 @@ mips32_plot(param_t *parms)
 	int c;
 
 	/* Header PGM. */
-	fprintf(parms->fp, "P2\n");
-	fprintf(parms->fp, "%u\n", (unsigned)parms->x_res);
-	fprintf(parms->fp, "%u\n", (unsigned)parms->y_res);
-	fprintf(parms->fp, "%u\n", (unsigned)(parms->shades - 1));
+	print_header(fileno(parms->fp), (int)parms->x_res, (int)parms->y_res, (int)parms->shades);
 
 	/* 
-	 * Barremos la región rectangular del plano complejo comprendida 
+	 * Barremos la regiï¿½n rectangular del plano complejo comprendida 
 	 * entre (parms->UL_re, parms->UL_im) y (parms->LR_re, parms->LR_im).
-	 * El parámetro de iteración es el punto (cr, ci).
+	 * El parï¿½metro de iteraciï¿½n es el punto (cr, ci).
 	 */
 	for (y = 0, ci = parms->UL_im; 
 	     y < parms->y_res; 
@@ -35,7 +34,7 @@ mips32_plot(param_t *parms)
 
 			/*
 			 * Determinamos el nivel de brillo asociado al punto
-			 * (cr, ci), usando la fórmula compleja recurrente 
+			 * (cr, ci), usando la fï¿½rmula compleja recurrente 
 			 * f = f^2 + s.
 			 */
 			for (c = 0; c < parms->shades; ++c) {
