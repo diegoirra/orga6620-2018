@@ -137,7 +137,7 @@ print_barra_n:
 	addu 	sp, sp, 16				#restauro stack pointer
 
 	jr 		ra 						#vuelvo a la direccion de retorno
-		
+
 
 print_number:
 	.frame	$fp,  40, ra 			# 16 SRA + 8 LTA + 16 ABA
@@ -173,9 +173,9 @@ print_number:
 	lw 		ra, 36(sp)			
 	lw 		$fp, 32(sp)			
 
-	addu 	sp, sp, 40				#restauro stack pointer
+	addu 	sp, sp, 40			#restauro stack pointer
 
-	jr 		ra 						#vuelvo a la direccion de retorno
+	jr 		ra 					#vuelvo a la direccion de retorno
 
 
 #Int to String: el int va en a0, cantidad de chars guardados en v0
@@ -188,49 +188,52 @@ inttostr:
 	.cpload t9
 	.set 	reorder
 
-	subu sp, sp, 16 				# 16(SRA)
+	subu 	sp, sp, 32 			# 16(SRA) + 16(LTA)
 	
-	.cprestore 4					#guardo gp en 4 + sp
-	sw $fp, 8(sp)					#guardo $fp en 8 + sp
-	sw ra, 12(sp)					#guardo ra en 12 + sp
+	.cprestore 20				#guardo gp en 4 + sp
+	sw 		$fp, 24(sp)			#guardo $fp en 8 + sp
+	sw 		ra, 28(sp)			#guardo ra en 12 + sp
 
-	move $fp, sp 					#$fp = sp (desde aca se usa $fp)
+	move 	$fp, sp 			#$fp = sp (desde aca se usa $fp)
 
-	sw a0, 16($fp)					#int = 16 + $fp
+	sw 		a0, 16($fp)			#int = 16 + $fp
 
-	addi t0, zero, 10		#establezco divisor base 10
-	move t1, zero			#t1=0
-	la t2, stringbuffer		#t2=stringbufferadress
-	add t3, a0, zero		#t3=a0 (int a imprimir)
+	addi 	t0, zero, 10		#establezco divisor base 10
+	move 	t1, zero			#t1=0
+	la 		t2, stringbuffer		#t2=stringbufferadress
+	add 	t3, a0, zero		#t3=a0 (int a imprimir)
 
-loop1:	div t3, t0			#t3/10 division:t4 resto:t5
-	mflo t4
-	mfhi t5
-	addi t1, t1, 1			#aumento contador de caracteres
-	bne  t3, 0, loop1		#cuando la division sea 0 ya termino el loop
-	add t3, a0, zero		#t3=a0 (int a imprimir)
-	move v0, t1				#v0=cant chars guardados
+# Cuento cantidad de digitos
+loop1:	
+	div 	t3, t0				#t3/10 division:t4 resto:t5
+	addi 	t1, t1, 1			#aumento contador de caracteres
+	bne  	t3, 0, loop1		#cuando la division sea 0 ya termino el loop
+	add 	t3, a0, zero		#t3=a0 (int a imprimir)
+	move 	v0, t1				#v0=cant chars guardados
 
-loop2:	div t3, t0			#vuelvo a divir esta vez guardando en el inicio de stringbuffer de atras para adelante
-	mflo t4
-	mfhi t5
-	addi t1, t1, -1			#decremento el contador de chars
-	add t6, t2, t1			#t6=offset en string buffer = stringbuffer + t1
-	addi t5, t5, 48			#le sumo 48 al valor del resto para que quede en la escala de los decimales ascii
-	sb t5, 0(t6)			#lo guardo en t6
-	bne t3, 0, loop2		#cuando la division sea 0 ya temrino el loop
+    sll 	t1, t1, 2
+    add 	t2, t2, t1
+loop2:
+    div 	t4, t3, 10
+    mfhi 	t4 					
+    sw 		t4, 0(t2)
+    subi 	t2, t2, 4
+    div 	t3, t3, 10
+    beqz 	t3, fin
+    b 		loop2
 
-#Restauro saved registers
+fin:	
+	#Restauro saved registers
 	
-	move sp, $fp 			#restauro valor de sp
+	move 	sp, $fp 			#restauro valor de sp
 
-	lw gp, 4(sp)			#restauro valor de gp
-	lw ra, 12(sp)			#restauro valor de ra
-	lw $fp, 8(sp)			#restauro valor de $fp
+	lw 		gp, 20(sp)			#restauro valor de gp
+	lw 		ra, 28(sp)			#restauro valor de ra
+	lw 		$fp, 24(sp)			#restauro valor de $fp
 
-	addu sp, sp, 16			#subo stack pointer
+	addu 	sp, sp, 32			#subo stack pointer
 
-	jr ra 					#vuelvo a la funcion caller
+	jr 		ra 					#vuelvo a la funcion caller
 
 
 	.end print_header
