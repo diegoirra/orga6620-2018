@@ -249,19 +249,19 @@ inttostr:
 
 # Cuento cantidad de digitos
 loop1:	
-	div 	t3, t0				#t3/10 = t4
-	mflo	t4
+	div 	t3, t0				#t3/10
 	addi 	t1, t1, 1			#aumento contador de caracteres
-	bnez  	t3, loop1		#cuando la division sea 0 ya termino el loop
+	bnez  	t3, loop1			#cuando la division sea 0 ya termino el loop
 
 exitloop1:
 	add 	t3, a0, zero		#t3=a0 (int a imprimir)
     move	v0, t1				#cant de chars guardados
-    sll 	t1, t1, 2			#t5= cant_digits * 4bytes
+    #sll 	t1, t1, 2			#t5= cant_digits * 4bytes
 
 loop2:
-    remu 	t4, t3, 10
-    addi	t1, t1, -4
+    div 	t3, t0
+    mfhi	t4					#t4 = t3%10
+    addi	t1, t1, -1
     add 	t5, t2, t1			#t5 = buffer(t2)+offset(t1)
     addi	t4, t4, 48
     sb 		t4, 0(t5)
