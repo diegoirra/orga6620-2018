@@ -140,44 +140,44 @@ print_barra_n:
 
 
 print_number:
-	.frame	$fp,  40, ra 			# 16 SRA + 8 LTA + 16 ABA
+	.frame	$fp,  32, ra 			# 16 SRA + 16 ABA
 	
 	.set 	noreorder
 	.cpload t9
 	.set reorder
 
 	# Salvo los registros del sra
-	subu 	sp, sp, 40 				# 16(SRA)
-	.cprestore 28					# guardo gp
-	sw		$fp, 32(sp)				# guardo fp
-	sw 		ra, 36(sp)  			# guardo ra
+	subu 	sp, sp, 32				# 16(SRA)
+	.cprestore 20					# guardo gp
+	sw		$fp, 24(sp)				# guardo fp
+	sw 		ra, 28(sp)  			# guardo ra
 	move	$fp, sp
 	
-	sw		a0, 40($fp)
-	sw		a1, 44($fp)
+	sw		a0, 32($fp)
+	sw		a1, 36($fp)
 
-	lw		a0, 44($fp)
+	lw		a0, 36($fp)
 	jal		inttostr
 
-	lw		a0, 40($fp)
+	lw		a0, 32($fp)
 	la		a1, stringbuffer
-	move		a2, v0   			#return de intostr= cant chars. VER SI HAY QUE SUMARLE UNO POR EL \0
-	li 		v0, 1
+	move	a2, v0   			#return de intostr= cant chars. VER SI HAY QUE SUMARLE UNO POR EL \0
+	li 		v0, SYS_write
 	syscall
 
 	# Restauro registros del sra
 	move	sp, $fp 			
 
-	lw 		gp, 28(sp)			
-	lw 		ra, 36(sp)			
-	lw 		$fp, 32(sp)			
+	lw 		gp, 20(sp)
+	lw 		ra, 28(sp)
+	lw 		$fp, 24(sp)
 
-	addu 	sp, sp, 40			#restauro stack pointer
+	addu 	sp, sp, 32			#restauro stack pointer
 
 	jr 		ra 					#vuelvo a la direccion de retorno
 
 
-#Int to String: el int va en a0, buffer para guardar string en a1, cantidad de chars guardados en v0
+#Int to String: el int va en a0, cantidad de chars guardados en v0
 
 inttostr:
 
