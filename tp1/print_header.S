@@ -219,7 +219,8 @@ loop2:
     remu 	t4, t3, 10
     addi	t1, t1, -4
     add 	t5, t2, t1			#t5 = buffer(t2)+offset(t1)
-    sw 		t4, 0(t5)
+    addi	t4, t4, 48
+    sb 		t4, (t5)
     bgez	t1, loop2
 
 exitloop2:
@@ -238,8 +239,8 @@ exitloop2:
 
 	.end print_header
 
-.rdata
-.align 2
+	.data
+	.align 2
 p2: .asciiz "P2"
 
 barran: .asciiz "\n"
