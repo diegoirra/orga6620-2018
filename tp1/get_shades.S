@@ -85,7 +85,7 @@ get_shades:
 
 
 for1:
-	bge 	s1, t1, fin 			#si y >= y_res => fin
+	bge 	s1, t1, return 			#si y >= y_res => fin
 
 	#Inicializaciones para el segundo for
 
@@ -141,7 +141,7 @@ next_for2:
 	lw t2, 96($fp)
 	lw t3, 100($fp)
 
-	bltz v0, error 					#Si v0 < 0 -> Error
+	bltz v0, return_error 			#Si v0 < 0 -> Return Error
 
 
 	addi s2, s2, 1 					#s2: ++x
@@ -155,7 +155,31 @@ next_for1:
 	sub.s 	$f0, $f0, $f8 			#f0: ci -= parms->d_im
 	b 		for1 					#vuelve a for1
 
+	#En caso de error hay que salir del programa, ya hay en v0 codigo de error negativo asi que no hace falta establecerlo
+return_error:
+	#PRINT IO ERROR
+	li a0, 2						#file descriptor stderror
+	la a1, fraseError				#imprimo "IO ERROR"
+	li a2, 9						#"IO ERROR\0" pesa 9 bytes
 
+	syscall
+
+
+return:
+	#Reestablezco caller saved registers a sus valores originales
+
+	lw s1, 116($fp)
+	lw s2, 120($fp)
+	lw s3, 124($fp)
+
+	move sp, $fp 					#restauro valor de sp
+	lw ra, 140(sp)					#restauro valor de ra
+	lw gp, 132(sp)					#restauro valor de gp
+	lw $fp, 136(sp)					#restauro valor de $fp
+
+	addu sp, sp, 144				#subo stack pointer
+
+	jr ra 		
 
 .data
 stringbuffer:   .space 32

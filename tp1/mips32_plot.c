@@ -5,6 +5,8 @@
 
 int print_header(int fd, int x, int y, int shades);
 
+int get_shades(param_t *parms);
+
 void
 mips32_plot(param_t *parms)
 {
@@ -23,6 +25,7 @@ mips32_plot(param_t *parms)
 	 * entre (parms->UL_re, parms->UL_im) y (parms->LR_re, parms->LR_im).
 	 * El par�metro de iteraci�n es el punto (cr, ci).
 	 */
+	#if 0
 	for (y = 0, ci = parms->UL_im; 
 	     y < parms->y_res; 
 	     ++y, ci -= parms->d_im) {
@@ -54,10 +57,13 @@ mips32_plot(param_t *parms)
 			}
 		}
 	}
-
+	
 	/* Flush any buffered information before quit. */
 	if (fflush(parms->fp) != 0) {
 		fprintf(stderr, "cannot flush output file.\n");
 		exit(1);
 	}
+	#endif
+	get_shades(parms);
+	
 }
