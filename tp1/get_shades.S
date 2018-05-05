@@ -85,7 +85,14 @@ get_shades:
 
 
 for1:
-	bge 	s1, t1, return 			#si y >= y_res => fin
+	lw 		a0, 76($fp)
+	lw		a1, 68($fp)
+	jal		print_number
+
+	lw		a0, 76($fp) 			#a0 = fd
+	jal		print_barra_n			#imprime /n			
+	b 		return
+	bge 	s1, t1, return 			#si y >= y_res => return
 
 	#Inicializaciones para el segundo for
 
@@ -336,7 +343,7 @@ exitloop2:
 	addu 	sp, sp, 32			#subo stack pointer
 
 	jr 		ra 					#vuelvo a la funcion caller
-	
+
 
 	.end get_shades		
 
