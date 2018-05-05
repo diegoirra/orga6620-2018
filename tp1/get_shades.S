@@ -83,14 +83,14 @@ get_shades:
 	l.s 	$f0, 36($fp) 			#f0: ci = parms->UL_Im
 	lw 		t1, 68($fp) 			#t1: parms-> y_res
 
-
-for1:
 	lw 		a0, 76($fp)
 	lw		a1, 68($fp)
 	jal		print_number
 
 	lw		a0, 76($fp) 			#a0 = fd
-	jal		print_barra_n			#imprime /n			
+	jal		print_barra_n			#imprime /n	
+
+for1:		
 	b 		return
 	bge 	s1, t1, return 			#si y >= y_res => return
 
