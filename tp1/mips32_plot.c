@@ -10,6 +10,9 @@ int get_shades(param_t *parms);
 void
 mips32_plot(param_t *parms)
 {
+	print_header(fileno(parms->fp), (int)parms->x_res, (int)parms->y_res, (int)parms->shades);
+	printf("Y_RES: %d\n", parms->y_res);
+	#if 0
 	float cr, ci;
 	float zr, zi;
 	float tr, ti;
@@ -18,14 +21,13 @@ mips32_plot(param_t *parms)
 	int c;
 
 	/* Header PGM. */
-	print_header(fileno(parms->fp), (int)parms->x_res, (int)parms->y_res, (int)parms->shades);
 
 	/* 
 	 * Barremos la regi�n rectangular del plano complejo comprendida 
 	 * entre (parms->UL_re, parms->UL_im) y (parms->LR_re, parms->LR_im).
 	 * El par�metro de iteraci�n es el punto (cr, ci).
 	 */
-	#if 0
+	
 	for (y = 0, ci = parms->UL_im; 
 	     y < parms->y_res; 
 	     ++y, ci -= parms->d_im) {
@@ -65,5 +67,5 @@ mips32_plot(param_t *parms)
 	}
 	#endif
 	get_shades(parms);
-	
+
 }
