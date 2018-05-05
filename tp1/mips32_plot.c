@@ -2,19 +2,35 @@
 #include <stdio.h>
 #include <defs.h>
 #include <param.h>
+#include <myparams.h>
 
 int print_header(int fd, int x, int y, int shades);
-int get_shades(param_t *parms);
+int get_shades(myparam_t *parms);
 
 void mips32_plot(param_t *parms){
 
 	print_header(fileno(parms->fp), (int)parms->x_res, (int)parms->y_res, (int)parms->shades);
-	printf("Y_RES: %d\n", parms->y_res);
+	printf("fileno: %d\n", fileno(parms->fp));
 	
-	int r = get_shades(parms);
-	if (r!=0){
-		printf("ERROR: get_shades exited with r= %d\n", r);
-	}
+	myparam_t *myparams;
+	myparams->UL_re = parms->UL_re;
+	myparams->UL_im = parms->UL_im;
+	myparams->LR_im = parms->LR_im;
+	myparams->LR_re = parms->LR_im;
+	myparams->d_im = parms->d_re;
+	myparams->s_im = parms->s_im;
+	myparams->d_re = parms->d_re;
+	myparams->s_re = parms->s_re;
+	myparams->x_res = parms->x_res;
+	myparams->y_res = parms->y_res;
+	myparams->shades = parms->shades;
+	myparams->fd = fileno(parms->fp);
+
+
+
+	int r = get_shades(myparams);
+	printf("get_shades exited with r= %d\n", r);
+
 
 
 //	float cr, ci;

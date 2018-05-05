@@ -1,3 +1,11 @@
+/*
+ * myparams.h
+ *
+ *  Created on: May 5, 2018
+ *      Author: d_irra
+ */
+
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -15,7 +23,7 @@ typedef struct {
 	size_t y_res;  /* vertical resolution, e.g. 480 */
 	size_t shades; /* amount of shades of gray, e.g. 255 */
 
-	FILE *fp;
-} param_t;
+	int fd;
+} myparam_t;
 
 
