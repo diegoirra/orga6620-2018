@@ -1,9 +1,6 @@
 #include <mips/regdef.h>
 #include <sys/syscall.h>
 
-#ifndef BUF_SZ
-#define BUF_SZ 8192
-#endif
 
 	.text
 	.abicalls
@@ -88,26 +85,25 @@ get_shades:
 
 
 	l.s 	$f6, 56($fp) 			#f6: cpr = parms->s_re
-	l.s 	$f16, 60($fp) 			#f7: cpi = parms->s_im
+	l.s 	$f16, 60($fp) 			#f16: cpi = parms->s_im
 
 	addu	s1, zero, zero 			#s1: y = 0
 	l.s 	$f0, 36($fp) 			#f0: ci = parms->UL_im
 	lw 		t1, 68($fp) 			#t1: parms-> y_res
 
 for1:		
-	b		return
 	bge 	s1, t1, return 			#si y >= y_res => return
 
 	#Inicializaciones para el segundo for
 
 	addu 	s2, zero, zero 			#s2: x = 0
-	l.s 	$f10, 32($fp)			#f1: cr = parms->UL_re
+	l.s 	$f10, 32($fp)			#f10: cr = parms->UL_re
 	lw 		t2, 64($fp)				#t2: parms-> x_res
 
 for2:
 	bge 	s2, t2, next_for1 		#si x >= x_res => next_for1
 	mov.s 	$f2, $f10 				#f2: zr = cr
-	mov.s 	$f12, $f0 				#f3: zi = ci
+	mov.s 	$f12, $f0 				#f12: zi = ci
 
 	#Inicializaciones para el tercer for
 
@@ -117,21 +113,21 @@ for2:
 for3:
 	bge 	s3, t3, next_for2 		#si c >= shades => next_for2
 	mul.s 	$f4, $f2, $f2 			#f4: zr * zr
-	mul.s 	$f14, $f12, $f12 			#f5: zi * zi
+	mul.s 	$f14, $f12, $f12 		#f14: zi * zi
 	add.s 	$f4, $f4, $f14 			#f4: absz = zr * zr + zi * zi
-	l.s 	$f5, CTE_FOR3 			#f5 = CTE_FOR3
+	l.s 	$f14, CTE_FOR3 			#f14 = CTE_FOR3
 	c.lt.s 	$f14, $f4  				#si CTE_FOR3 < absz => code = 1
 	bc1t 	next_for2 				#si code = 1 => next_for2
 	mul.s 	$f4, $f2, $f2 			#f4: zr * zr
-	mul.s 	$f14, $f12, $f12 			#f5: zi * zi
+	mul.s 	$f14, $f12, $f12 		#f14: zi * zi
 	sub.s 	$f4, $f4, $f14 			#f4: zr * zr - zi * zi
 	add.s 	$f4, $f4, $f6 			#f4: sr = zr * zr - zi * zi + cpr
-	mul.s 	$f14, $f2, $f12 			#f5: zr * zi
+	mul.s 	$f14, $f2, $f12 		#f14: zr * zi
 	l.s 	$f8, CTE_MULT 			#f8: CTE_MULT
-	mul.s 	$f14, $f14, $f8 			#f5: 2 * zr * zi
-	add.s 	$f14, $f14, $f16 			#f5: si = 2 * zr * zi + cpi
+	mul.s 	$f14, $f14, $f8 		#f14: 2 * zr * zi
+	add.s 	$f14, $f14, $f16 		#f14: si = 2 * zr * zi + cpi
 	mov.s 	$f2, $f4 				#f2: zr = sr
-	mov.s 	$f12, $f14 				#f3: zi = si
+	mov.s 	$f12, $f14 				#f12: zi = si
 	addi 	s3, s3, 1 				#s3: ++c
 	b 		for3
 
@@ -152,7 +148,7 @@ next_for2:
 
 	addi s2, s2, 1 					#s2: ++x
 	l.s $f8, 48($fp)				#f8: parms->d_re
-	add.s $f10, $f10, $f8 			#f1: cr += parms->d_re
+	add.s $f10, $f10, $f8 			#f10: cr += parms->d_re
 	b for2 							#vuelve a for2
 
 next_for1:
@@ -231,9 +227,9 @@ print_barra_n:
 returnn:
 	move	sp, $fp 			
 
-	lw 		gp, 4(sp)			
-	lw 		ra, 12(sp)			
-	lw 		$fp, 8(sp)			
+	lw 		gp, 4(sp)
+	lw 		ra, 12(sp)
+	lw 		$fp, 8(sp)
 
 	addu 	sp, sp, 16				#restauro stack pointer
 
