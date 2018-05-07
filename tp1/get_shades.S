@@ -66,7 +66,7 @@ get_shades:
 	sw 		t0, 136($fp)				#guardo SHADES en 136 + $fp
 
 	lw 		t0, 44(a0)
-	sw 		t0, 140($fp)				#guardo FILE POINTER en 140 + $fp (DESCRIPTOR USADO MYPARAMS)
+	sw 		t0, 140($fp)				#save fp
 
 
 	sw 		s1, 144($fp)			#guardo s1 en 116 + $fp
@@ -93,16 +93,16 @@ get_shades:
 	lw 		t1, 132($fp) 			#t1: parms-> y_res
 
 	lw 		a0, 140($fp)
+	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
 	lw		a1, 132($fp)
 	jal		print_number
 	bltz	v0, return
 
-	lw		a0, 140($fp) 			#a0 = fd
+	lw		a0, 140($fp) 			#a0 = fp
+	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
 	jal		print_barra_n			#imprime /n
 	bltz	v0, return
 
-	li		v0, 10					#10 como está todo bien
-	b 		return
 for1:		
 	bge 	s1, t1, return 			#si y >= y_res => return
 
@@ -144,22 +144,17 @@ for3:
 	b 		for3
 
 next_for2:
-/*
-	sw t1, 	92($fp) 				#NO HACE FALTA GUARDAR TEMPORALES (???)
-	sw t2, 	96($fp)
-	sw t3, 	100($fp)
-*/
-	lw		a0, 140($fp) 			#a0 = fd
+
+
+	lw		a0, 140($fp) 			#a0 = fp
+	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
 	move	a1, s3 					#a1 = shade a imprimir
 	jal		print_number			#imprime el shade
 
-	lw		a0, 140($fp) 			#a0 = fd
+	lw		a0, 140($fp) 			#a0 = fp
+	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
 	jal		print_barra_n			#imprime /n
-/*
-	lw t1, 92($fp)
-	lw t2, 96($fp)
-	lw t3, 100($fp)
-*/
+
 	bltz v0, return_error 			#Si v0 < 0 -> Return Error
 
 
