@@ -12,105 +12,97 @@
 	.ent 	get_shades
 
 get_shades:
-	.frame 	$fp, 96, ra
+	.frame 	$fp, 144, ra
 
 	.set 	noreorder
 	.cpload t9
 	.set 	reorder
 
-	subu sp, sp, 96 				# 16(SRA) + 48 (3 s)(8 f) (LTA) + 32 (ABA)
+	subu 	sp, sp, 144 				# 32(SRA) + 80 (LTA) + 32 (ABA)
 
-	.cprestore 84					#guardo gp en 132 + sp
-	sw 		$fp, 88(sp)			#guardo $fp en 136 + sp
-	sw 		ra, 92(sp)				#guardo ra en 140 + sp
+	.cprestore 132						#guardo gp en 132 + sp
+	sw 		$fp, 136(sp)				#guardo $fp en 136 + sp
+	sw 		ra, 140(sp)					#guardo ra en 140 + sp
 
-	move 	$fp, sp 				#$fp = sp (desde aca se usa $fp)
+	move 	$fp, sp 					#$fp = sp (desde aca se usa $fp)
 
-	sw 		a0, 96($fp)			#guardo el parametro(*parms) en la ABA de la funcion que me llamo
+
+	sw 		a0, 144($fp)				#guardo el parametro(*parms) en la ABA de la funcion que me llamo
 
 #
 #	Guardo la data de *params en el stack local.
 #
 
 	lw 		t0, 0(a0)
-	sw 		t0, 96($fp)				#guardo UL_Re en 96 + $fp
+	sw 		t0, 32($fp)					#UL_re: 32 + $fp
 
 	lw 		t0, 4(a0)
-	sw 		t0, 100($fp)				#guardo UL_Im en 100 + $fp
+	sw 		t0, 36($fp)					#UL_im: 36 + $fp
 
 	lw 		t0, 8(a0)
-	sw 		t0, 104($fp)				#guardo LR_Re en 104 + $fp
+	sw 		t0, 40($fp)					#LR_re: 40 + $fp
 
 	lw 		t0, 12(a0)
-	sw 		t0, 108($fp)				#guardo LR_Im en 108 + $fp
+	sw 		t0, 44($fp)					#LR_im: 44 + $fp
 
 	lw 		t0, 16(a0)
-	sw 		t0, 112($fp)				#guardo D_Re en 112 + $fp
+	sw 		t0, 48($fp)					#d_re: 48 + $fp
 
 	lw 		t0, 20(a0)
-	sw 		t0, 116($fp)				#guardo D_Im en 116 + $fp
+	sw 		t0, 52($fp)					#d_im: 52 + $fp
 
 	lw 		t0, 24(a0)
-	sw 		t0, 120($fp)				#guardo CP_Re en 120 + $fp
+	sw 		t0, 56($fp)					#s_re: 56 + $fp
 
 	lw 		t0, 28(a0)
-	sw 		t0, 124($fp)				#guardo CP_Im en 124 + $fp
+	sw 		t0, 60($fp)					#s_im: 60 + $fp
 
 	lw 		t0, 32(a0)
-	sw 		t0, 128($fp)				#guardo X_RES en 128 + $fp
+	sw 		t0, 64($fp)					#x_res: 64 + $fp
 
 	lw 		t0, 36(a0)
-	sw 		t0, 132($fp)				#guardo Y_RES en 132 + $fp
+	sw 		t0, 68($fp)					#y_res: 68 + $fp
 
 	lw 		t0, 40(a0)
-	sw 		t0, 136($fp)				#guardo SHADES en 136 + $fp
+	sw 		t0, 72($fp)					#SHADES: 72 + $fp
 
 	lw 		t0, 44(a0)
-	sw 		t0, 140($fp)				#save fp
+	sw 		t0, 76($fp)					#filepointer: 76 + $fp
+
+	sw 		s1, 116($fp)				#guardo s1 en 116 + $fp
+	sw 		s2, 120($fp)				#guardo s1 en 120 + $fp
+	sw 		s3, 124($fp)				#guardo s1 en 124 + $fp
+
+/*
+	s.s		$f10, 128($fp)			#save floating point registers
+	s.s		$f2, 132($fp)			#save floating point registers
+	s.s		$f12, 136($fp)			#save floating point registers
+	s.s		$f4, 140($fp)			#save floating point registers
+	s.s		$f14, 144($fp)			#save floating point registers
+	s.s		$f6, 148($fp)			#save floating point registers
+	s.s		$f16, 152($fp)			#save floating point registers
+	s.s		$f8, 156($fp)			#save floating point registers
+	s.s		$f0, 160($fp)			#(HAY QUE SUMARLE AL 144)
+*/
 
 
-	sw 		s1, 144($fp)			#guardo s1 en 116 + $fp
-	sw 		s2, 148($fp)			#guardo s2 en 120 + $fp
-	sw 		s3, 152($fp)			#guardo s3 en 124 + $fp
 
-	s.s		$f10, 156($fp)			#save floating point registers
-	s.s		$f2, 160($fp)			#save floating point registers
-	s.s		$f12, 164($fp)			#save floating point registers
-	s.s		$f4, 168($fp)			#save floating point registers
-	s.s		$f14, 172($fp)			#save floating point registers
-	s.s		$f6, 176($fp)			#save floating point registers
-	s.s		$f16, 180($fp)			#save floating point registers
-	s.s		$f8, 184($fp)			#save floating point registers
-	s.s		$f0, 188($fp)			#save floating point registers
-
-
-
-	l.s 	$f6, 120($fp) 			#f6: cpr = parms->cp_re
-	l.s 	$f16, 124($fp) 			#f7: cpi = parms->cp_im
+	l.s 	$f6, 56($fp) 			#f6: cpr = parms->s_re
+	l.s 	$f16, 60($fp) 			#f7: cpi = parms->s_im
 
 	addu	s1, zero, zero 			#s1: y = 0
-	l.s 	$f0, 100($fp) 			#f0: ci = parms->UL_Im
-	lw 		t1, 132($fp) 			#t1: parms-> y_res
-
-	lw 		a0, 140($fp)
-	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
-	lw		a1, 132($fp)
-	jal		print_number
-	bltz	v0, return
-
-	lw		a0, 140($fp) 			#a0 = fp
-	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
-	jal		print_barra_n			#imprime /n
-	bltz	v0, return
+	l.s 	$f0, 36($fp) 			#f0: ci = parms->UL_im
+	lw 		t1, 68($fp) 			#t1: parms-> y_res
 
 for1:		
+	b		return
 	bge 	s1, t1, return 			#si y >= y_res => return
 
 	#Inicializaciones para el segundo for
 
 	addu 	s2, zero, zero 			#s2: x = 0
-	l.s 	$f10, 96($fp)			#f1: cr = parms->UL_Re
-	lw 		t2, 128($fp)				#t2: parms-> x_res
+	l.s 	$f10, 32($fp)			#f1: cr = parms->UL_re
+	lw 		t2, 64($fp)				#t2: parms-> x_res
 
 for2:
 	bge 	s2, t2, next_for1 		#si x >= x_res => next_for1
@@ -120,7 +112,7 @@ for2:
 	#Inicializaciones para el tercer for
 
 	addu 	s3, zero, zero 			#s3: c = 0
-	lw 		t3, 136($fp) 			#t3: parms->shades
+	lw 		t3, 72($fp) 			#t3: parms->shades
 
 for3:
 	bge 	s3, t3, next_for2 		#si c >= shades => next_for2
@@ -146,12 +138,12 @@ for3:
 next_for2:
 
 
-	lw		a0, 140($fp) 			#a0 = fp
+	lw		a0, 76($fp) 			#a0 = fp
 	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
 	move	a1, s3 					#a1 = shade a imprimir
 	jal		print_number			#imprime el shade
 
-	lw		a0, 140($fp) 			#a0 = fp
+	lw		a0, 76($fp) 			#a0 = fp
 	lw		a0, 56(a0)				#fd es 14 lugares(14*4) dsps del fp
 	jal		print_barra_n			#imprime /n
 
@@ -159,13 +151,13 @@ next_for2:
 
 
 	addi s2, s2, 1 					#s2: ++x
-	l.s $f8, 112($fp)				#f8: parms->d_re
+	l.s $f8, 48($fp)				#f8: parms->d_re
 	add.s $f10, $f10, $f8 			#f1: cr += parms->d_re
 	b for2 							#vuelve a for2
 
 next_for1:
 	addi 	s1, s1, 1 				#s1: ++y
-	l.s 	$f8, 116($fp) 			#f8: parms->d_im
+	l.s 	$f8, 52($fp) 			#f8: parms->d_im
 	sub.s 	$f0, $f0, $f8 			#f0: ci -= parms->d_im
 	b 		for1 					#vuelve a for1
 
@@ -182,10 +174,11 @@ return_error:
 return:
 	#Reestablezco caller saved registers a sus valores originales
 
-	lw 		s1, 144($fp)			#guardo s1 en 116 + $fp
-	lw 		s2, 148($fp)			#guardo s2 en 120 + $fp
-	lw 		s3, 152($fp)			#guardo s3 en 124 + $fp
+	lw 		s1, 116($fp)			#guardo s1 en 116 + $fp
+	lw 		s2, 120($fp)			#guardo s2 en 120 + $fp
+	lw 		s3, 124($fp)			#guardo s3 en 124 + $fp
 
+/*
 	l.s		$f10, 156($fp)			#save floating point registers
 	l.s		$f2, 160($fp)			#save floating point registers
 	l.s		$f12, 164($fp)			#save floating point registers
@@ -195,16 +188,18 @@ return:
 	l.s		$f16, 180($fp)			#save floating point registers
 	l.s		$f8, 184($fp)			#save floating point registers
 	l.s		$f0, 188($fp)			#save floating point registers
-
+*/
 
 	move sp, $fp 					#restauro valor de sp
-	lw ra, 92(sp)					#restauro valor de ra
-	lw gp, 84(sp)					#restauro valor de gp
-	lw $fp, 88(sp)					#restauro valor de $fp
+	lw ra, 140(sp)					#restauro valor de ra
+	lw gp, 132(sp)					#restauro valor de gp
+	lw $fp, 136(sp)					#restauro valor de $fp
 
-	addu sp, sp, 96				#subo stack pointer
+	addu sp, sp, 144				#subo stack pointer
 
-	jr ra 
+	jr ra 							#vuelvo a la funcion caller
+
+
 
 
 print_barra_n:
@@ -252,6 +247,9 @@ write_error_tamn:
 	li	v0, -3
 	j returnn
 
+
+
+
 print_number:
 	.frame	$fp,  32, ra 			# 16 SRA + 16 ABA
 	
@@ -281,7 +279,6 @@ print_number:
 	bne		a3, zero, write_errornum
 	bne		v0, a2, write_error_tamnum
 
-
 	# Restauro registros del sra
 returnnum:
 	move	sp, $fp 			
@@ -304,8 +301,8 @@ write_error_tamnum:
 
 
 
-#Int to String: el int va en a0, cantidad de chars guardados en v0
 
+#Int to String: el int va en a0, cantidad de chars guardados en v0
 inttostr:
 
 	.frame 	$fp, 16, ra
