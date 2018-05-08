@@ -17,15 +17,15 @@ get_shades:
 
 	subu 	sp, sp, 144 				# 32(SRA) + 80 (LTA) + 32 (ABA)
 
-	.cprestore 132						#save gp en 132 + sp
-	sw 		$fp, 136(sp)				#save $fp en 136 + sp
-	sw 		ra, 140(sp)					#save ra en 140 + sp
+	.cprestore 132
+	sw 		$fp, 136(sp)
+	sw 		ra, 140(sp)
 
-	move 	$fp, sp 					#$fp = sp (desde aca se usa $fp)
+	move 	$fp, sp
 
 
-	sw 		a0, 144($fp)				#guardo el parametro(*parms) en la ABA de la funcion que me llamo
-	sw 		a1, 148($fp)				#guardo el parametro fd en el lugar del fp
+	sw 		a0, 144($fp)
+	sw 		a1, 148($fp)
 
 #
 #	Guardo la data de *params en el stack local.
@@ -72,7 +72,7 @@ get_shades:
 	sw 		s1, 120($fp)				#save s1 en 120 + $fp
 	sw 		s2, 124($fp)				#save s2 en 124 + $fp
 	sw 		s3, 128($fp)				#save s3 en 128 + $fp
-	sw 		s3, 80($fp)					#save s4 en 80 + $fp
+	sw 		s4, 80($fp)					#save s4 en 80 + $fp
 
 ########################################################
 
@@ -96,9 +96,9 @@ for3:
 	mul.s 	$f12, $f8, $f8	 			#f12: zr * zr
 	mul.s 	$f14, $f10, $f10 			#f14: zi * zi
 	add.s 	$f16, $f12, $f14 			#f16: absz = zr * zr + zi * zi
-	l.s 	$f18, CTE_FOR3 				#f18 = CTE_FOR3
-	c.lt.s 	$f18, $f16 					#if CTE_FOR3 < absz => code = 1
-	bc1t 	breakfor3					#si code = 1 => breakfor3
+	l.s 	$f18, CTE_FOR3 				#f18: CTE_FOR3
+	c.le.s 	$f18, $f16 					#if CTE_FOR3 <= absz => code = 1
+	bc1t 	breakfor3					#if code = 1 : breakfor3
 
 	sub.s 	$f20, $f12, $f14 			#f20: zr * zr - zi * zi
 	l.s		$f22, 56($fp)				#f22: s_re
@@ -108,7 +108,7 @@ for3:
 	l.s 	$f26, CTE_MULT 				#f26: CTE_MULT
 	mul.s 	$f28, $f24, $f26 			#f28: 2*(zr * zi)
 	l.s		$f30, 60($fp)				#f30: s_im
-	add.s 	$f28, $f14, $f16 			#f28: ti = s_im+(2*(zr * zi))
+	add.s 	$f28, $f30, $f28 			#f28: ti = s_im+(2*(zr * zi))
 
 	mov.s 	$f8, $f20 					#f: zr = tr
 	mov.s 	$f10, $f28 					#f: zi = ti
@@ -123,13 +123,13 @@ breakfor3:
 	#(SUPUESTAMENTE, sobreescrbimos el fp con el fd recibido como argumento)
 	move	a1, s4						#a1 = shade a imprimir
 	jal		print_number				#imprime el shade
-	bltz 	v0, return_error 			#if v0 < 0 : ReturnError
+	bltz 	v0, return_error 			#if v0 < 0 : return_error
 
 	lw		a0, 76($fp) 				#a0 = fp
 	#lw		a0, 56(a0)					#fd es 14 lugares(14*4) dsps del fp
 	#(SUPUESTAMENTE. Sobreescrbimos el fp con el fd recibido como argumento)
 	jal		print_barra_n				#imprime /n
-	bltz 	v0, return_error 			#if v0 < 0 : ReturnError
+	bltz 	v0, return_error 			#if v0 < 0 : return_error
 
 	#vuelta for2
 	addi 	s2, s2, 1 					#++x
@@ -144,7 +144,7 @@ breakfor3:
 	blt 	s0, s1, for1
 
 
-	#En caso de error hay que salir del programa, ya hay en v0 codigo de error negativo asi que no hace falta establecerlo
+	#v0 codigo de error negativo asi que no hace falta establecerlo
 return_error:
 	#PRINT IO ERROR
 	li a0, 2						#file descriptor stderror
@@ -285,11 +285,11 @@ inttostr:
 
 	subu 	sp, sp, 32 			# 16(SRA) + 16(LTA)
 	
-	.cprestore 20				#guardo gp en 4 + sp
-	sw 		$fp, 24(sp)			#guardo $fp en 8 + sp
-	sw 		ra, 28(sp)			#guardo ra en 12 + sp
+	.cprestore 20
+	sw 		$fp, 24(sp)
+	sw 		ra, 28(sp)
 
-	move 	$fp, sp 			#$fp = sp (desde aca se usa $fp)
+	move 	$fp, sp
 
 	sw 		a0, 16($fp)			#int = 16 + $fp
 	sw 		a1, 20($fp)			#buffer
@@ -321,15 +321,15 @@ loop2:
 exitloop2:
 	#Restauro saved registers
 	
-	move 	sp, $fp 			#restauro valor de sp
+	move 	sp, $fp
 
-	lw 		gp, 20(sp)			#restauro valor de gp
-	lw 		ra, 28(sp)			#restauro valor de ra
-	lw 		$fp, 24(sp)			#restauro valor de $fp
+	lw 		gp, 20(sp)
+	lw 		ra, 28(sp)
+	lw 		$fp, 24(sp)
 
-	addu 	sp, sp, 32			#subo stack pointer
+	addu 	sp, sp, 32
 
-	jr 		ra 					#vuelvo a la funcion caller
+	jr 		ra
 
 
 	.end get_shades		
