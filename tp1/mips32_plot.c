@@ -4,14 +4,13 @@
 #include <param.h>
 
 int print_header(int fd, int x, int y, int shades);
-int get_shades(param_t *parms);
+int get_shades(param_t *parms, int fd);
 
 void mips32_plot(param_t *parms){
 
 	print_header(fileno(parms->fp), (int)parms->x_res, (int)parms->y_res, (int)parms->shades);
 
-	int r = get_shades(parms);
-	printf("get_shades exited with r= %d\n", r);
+	get_shades(parms, fileno(parms->fp));
 
 
 
