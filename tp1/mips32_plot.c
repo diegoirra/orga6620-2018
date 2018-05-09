@@ -3,9 +3,10 @@
 #include <defs.h>
 #include <param.h>
 
-void get_shades(param_t *parms, int fd);
+int print_header(int fd, int x, int y, int shades);
+int get_shades(param_t *parms, int fd);
 
-int mips32_plot_asm(param_t *parms){
+void mips32_plot_asm(param_t *parms){
 	print_header(fileno(parms->fp), (int)parms->x_res, (int)parms->y_res, (int)parms->shades);
 	get_shades(parms, fileno(parms->fp));
 }

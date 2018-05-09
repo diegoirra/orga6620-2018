@@ -28,7 +28,7 @@ extern void mips32_plot(param_t *);
 extern void mips32_plot_asm(param_t *parms);
 
 /*
- * Parámetros globales.
+ * Parï¿½metros globales.
  */
 
 int x_res = 640;		/* Ancho de imagen por defecto. */
@@ -319,7 +319,7 @@ static void
 do_method(const char *name, const char *spec)
 {
 	if (strcmp(spec, "mips32") == 0){
-		plot = &get_shades;
+		plot = &mips32_plot_asm;
 	}
 		
 }
