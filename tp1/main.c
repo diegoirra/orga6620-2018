@@ -25,6 +25,7 @@
 
 static void do_plot(void);
 extern void mips32_plot(param_t *);
+extern void mips32_plot_asm(param_t *parms);
 
 /*
  * Parámetros globales.
@@ -317,8 +318,10 @@ do_width(const char *name, const char *spec)
 static void
 do_method(const char *name, const char *spec)
 {
-	fprintf(stderr, "do_method: notyet\n");
-	exit(1);
+	if (strcmp(spec, "mips32") == 0){
+		plot = &get_shades;
+	}
+		
 }
 
 static void
